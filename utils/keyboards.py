@@ -64,10 +64,11 @@ class PaymentKB(KB):
 
 
 class ShopKB(KB):
-    b_buy = InlineKeyboardButton(text='💰 Купить', callback_data='buy_0')
-    b_increace_amount = InlineKeyboardButton(text='+', callback_data='buy_1')
-    b_decreace_amount = InlineKeyboardButton(text='-', callback_data='buy_-1')
+    b_buy = InlineKeyboardButton(text='💰 Купить', callback_data='buy')
     b_add_to_cart = InlineKeyboardButton(text='🛒 Добавить в корзину', callback_data='add_to_cart')
+    b_show_cart = InlineKeyboardButton(text='🛒 Просмотреть корзину', callback_data='show_cart')
+    b_increace_amount = InlineKeyboardButton(text='+', callback_data='change_amount_1')
+    b_decreace_amount = InlineKeyboardButton(text='-', callback_data='change_amount_-1')
 
     @classmethod
     def back_to_shop(cls) -> InlineKeyboardMarkup:
@@ -89,6 +90,7 @@ class ShopKB(KB):
                 builder.row(InlineKeyboardButton(text=text, callback_data=f'{prefix}_{id_}'))
             else:
                 builder.add(InlineKeyboardButton(text=text, callback_data=f'{prefix}_{id_}'))
+        builder.row(cls.b_show_cart)
         if back_to_shop_button:
             builder.row(cls.b_shop)
         builder.row(cls.b_back_to_main)
@@ -97,17 +99,12 @@ class ShopKB(KB):
     @classmethod
     def item(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        builder.add(cls.b_buy, cls.b_add_to_cart, cls.b_shop, cls.b_back_to_main)
-        return builder.adjust(1).as_markup()
-
-    @classmethod
-    def set_amount(cls) -> InlineKeyboardMarkup:
-        builder = InlineKeyboardBuilder()
         builder.add(
             cls.b_buy,
-            cls.b_decreace_amount,
-            cls.b_increace_amount,
+            cls.b_add_to_cart,
+            cls.b_decreace_amount, cls.b_increace_amount,
             cls.b_shop,
-            cls.b_back_to_main
-        )
-        return builder.adjust(1, 2, 1).as_markup()
+            cls.b_back_to_main)
+        return builder.adjust(1, 1, 2, 1).as_markup()
+
+

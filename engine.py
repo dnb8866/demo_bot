@@ -13,7 +13,7 @@ from sqlalchemy.dialects.postgresql import insert
 import config
 from utils.db import AlchemySqlDb
 from utils.models_orm import Base
-from utils.repositories import ShopRepository
+from utils.repositories import ShopRepository, UserRepository
 
 telegram_bot = Bot(token=config.TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode=config.TELEGRAM_PARSE_MODE))
 redis_storage = RedisStorage.from_url(config.REDIS_URL, state_ttl=config.STATE_TTL, data_ttl=config.DATA_TTL)
@@ -21,12 +21,13 @@ logging.basicConfig(level=config.LOG_LEVEL, stream=sys.stdout)
 
 db = AlchemySqlDb(config.SQLALCHEMY_DATABASE_URL, Base)
 
-repo = ShopRepository(db)
+user_repo = UserRepository(db)
+shop_repo = ShopRepository(db)
 
 
 async def main():
-    print(await repo.db.clean())
-    print(await repo.db.prepare())
+    print(await shop_repo.db.clean())
+    print(await shop_repo.db.prepare())
 
     # from utils.models_orm import User, Item, Category, OrderItem, Order
     # await db.clean()

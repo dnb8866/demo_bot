@@ -2,4 +2,5 @@ from aiogram.fsm.state import StatesGroup, State
 
 
 class ShopFsm(StatesGroup):
-    buy_now = State()
+    item_info = State()
+    test = State()

@@ -21,10 +21,11 @@ def shop():
 def items():
     return 'Выберите товар/услугу 👇'
 
-def item(item_obj: Item):
-    return (f'� Название: {item_obj.name}\n\n'
-            f'� Описание: {item_obj.description}\n\n'
-            f'� Цена: {item_obj.price} руб.\n\n'
+def item(name, description, price, amount: int):
+    return (f'� Название: {name}\n\n'
+            f'� Описание: {description}\n\n'
+            f'� Цена: {price} руб.\n\n'
+            f'� Количество: {amount}\n\n'
             f'� Для добавления товара в корзину нажмите "Добавить в корзину" 👇')
 
 

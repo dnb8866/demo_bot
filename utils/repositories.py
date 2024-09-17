@@ -51,20 +51,25 @@ class ShopRepository:
 
     async def add_order_item(self, user_id: int, item_id: int, quantity: int) -> OrderItem:
         async with self.db.SessionLocal() as session:
-            order_item = OrderItem(user_id=user_id, item_id=item_id, quantity=quantity)
+            dt_now = datetime.datetime.utcnow()
+            order_item = OrderItem(user_id=user_id, item_id=item_id, quantity=quantity, created=dt_now, updated=dt_now)
             session.add(order_item)
             await session.commit()
             return order_item
 
-    async def get_order_item(self, order_item_id: int) -> OrderItem | None:
+    async def get_order_item(self, order_item_id: int, without_order=False) -> OrderItem | None:
         async with self.db.SessionLocal() as session:
             order_item = (await session.execute(
                 select(OrderItem).where(OrderItem.id == order_item_id)
             )).scalar_one_or_none()
             return order_item
 
-    async def get_all_order_items(self, user_id: int) -> list[OrderItem]:
+    async def get_all_order_items(self, user_id: int, without_order=False) -> list[OrderItem]:
         async with self.db.SessionLocal() as session:
+            if without_order:
+                return (await session.execute(
+                    select(OrderItem).where(OrderItem.user_id == user_id, OrderItem.order_id.is_(None)))
+                ).scalars().all()
             return (await session.execute(select(OrderItem).where(OrderItem.user_id == user_id))).scalars().all()
 
     async def update_order_item(self, item_id: int, quantity: int) -> OrderItem:

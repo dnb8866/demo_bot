@@ -19,8 +19,9 @@ class User(Base):
     created: Mapped[datetime] = mapped_column()
     updated: Mapped[datetime] = mapped_column()
 
-    def __str__(self):
-        return f'User({self.id}, {self.firstname})'
+    def __repr__(self):
+        return (f'User({self.id}, {self.firstname}, {self.lastname}, '
+                f'{self.username}, {self.ban}, {self.created}, {self.updated})')
 
 
 class Category(Base):
