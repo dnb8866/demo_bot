@@ -16,7 +16,6 @@ router = Router()
 async def start(message: types.Message, state: FSMContext):
     await state.clear()
     user = await user_repo.get(message.from_user.id)
-    print(user)
     if not user:
         dt_now = datetime.utcnow()
         user = User(
@@ -28,14 +27,14 @@ async def start(message: types.Message, state: FSMContext):
             updated=dt_now,
         )
         await user_repo.add(user)
-    await message.answer(t.main(message.from_user.first_name),
+    await message.answer(await t.main(message.from_user.first_name),
                          reply_markup=KB.main())
 
 
 @router.callback_query(F.data == 'start')
 async def start_callback(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text(t.main(callback.from_user.first_name),
+    await callback.message.edit_text(await t.main(callback.from_user.first_name),
                                      reply_markup=KB.main())
 
 

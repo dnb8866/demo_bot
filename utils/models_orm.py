@@ -51,7 +51,7 @@ class OrderItem(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.id'))
     item_id: Mapped[int] = mapped_column(ForeignKey('items.id'))
-    item: Mapped['Item'] = relationship()
+    item: Mapped['Item'] = relationship(lazy='joined')
     order_id: Mapped[UUID] = mapped_column(ForeignKey('orders.id'), nullable=True)
     order: Mapped['Order'] = relationship(back_populates='order_items')
     quantity: Mapped[int] = mapped_column()
@@ -59,15 +59,16 @@ class OrderItem(Base):
     updated: Mapped[datetime] = mapped_column()
 
     def __repr__(self):
-        return f'OrderItem({self.id}, {self.user_id}, {self.item_id}, {self.order_id}, {self.quantity})'
+        return (f'OrderItem({self.id}, {self.user_id}, {self.item_id}, {self.order_id}, '
+                f'{self.quantity}, {self.created}, {self.updated})')
 
 
 class Order(Base):
     __tablename__ = 'orders'
 
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.id'))
-    order_items: Mapped[list['OrderItem']] = relationship(back_populates='order')
+    order_items: Mapped[list['OrderItem']] = relationship(back_populates='order', lazy='joined')
     status: Mapped[str] = mapped_column()
     created: Mapped[datetime] = mapped_column()
     updated: Mapped[datetime] = mapped_column()

@@ -1,7 +1,10 @@
-from utils.models_orm import Item
+from decimal import Decimal
+
+import utils.assist as assist
+from utils.models_orm import Item, OrderItem
 
 
-def main(name):
+async def main(name):
     return (f'🔆 Здравствуйте, {name}!\n\n'
             f'Для оплаты услуг выберите "Оплата" 👇')
 
@@ -14,20 +17,48 @@ def main(name):
 #             '👇')
 
 
-def shop():
-    return 'Выберите раздел 👇'
+async def shop():
+    return '👇 Выберите раздел 👇'
 
 
-def items():
-    return 'Выберите товар/услугу 👇'
+async def items():
+    return '👇 Выберите товар/услугу 👇'
 
-def item(name, description, price, amount: int):
+
+async def item(name, description, price, quantity: int):
     return (f'� Название: {name}\n\n'
             f'� Описание: {description}\n\n'
             f'� Цена: {price} руб.\n\n'
-            f'� Количество: {amount}\n\n'
+            f'� Количество: {quantity}\n\n'
             f'� Для добавления товара в корзину нажмите "Добавить в корзину" 👇')
 
 
-def payment_description():
+async def show_cart(order_items: list[OrderItem], total_price: Decimal):
+    result = ['🛒 Ваша корзина 🛒\n']
+    for order_item in order_items:
+        res = (
+            f'<u>{order_item.item.name}</u>',
+            f'Цена: {str(order_item.item.price)}',
+            f'Количество: {str(order_item.quantity)}',
+            f'Сумма: {Decimal(str(order_item.item.price)) * order_item.quantity}\n'
+        )
+        result.append('\n'.join(res))
+    result.append(f'<b><u>Общая сумма заказа: {total_price}</u></b>')
+    return '\n'.join(result)
+
+
+async def all_orders_from_user(orders: list):
+    result = ['📋 Ваши заказы 📋\n']
+    for order in orders:
+        res = (
+            f'<u>Заказ № {order.id}</u>',
+            f'Статус: {order.status}',
+            f'Дата создания: {order.created.strftime("%d.%m.%Y")}',
+            f'Сумма заказа: {await assist.calculate_total_price_from_items(order.order_items)}\n'
+        )
+        result.append('\n'.join(res))
+    return '\n'.join(result)
+
+
+async def payment_description():
     return '👇 Выберите способ оплаты 👇'

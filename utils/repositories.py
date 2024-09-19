@@ -69,13 +69,14 @@ class ShopRepository:
             if without_order:
                 return (await session.execute(
                     select(OrderItem).where(OrderItem.user_id == user_id, OrderItem.order_id.is_(None)))
-                ).scalars().all()
+                        ).scalars().all()
             return (await session.execute(select(OrderItem).where(OrderItem.user_id == user_id))).scalars().all()
 
-    async def update_order_item(self, item_id: int, quantity: int) -> OrderItem:
+
+    async def update_order_item(self, order_item_id: int, quantity: int) -> OrderItem:
         async with self.db.SessionLocal() as session:
             order_item = (await session.execute(
-                select(OrderItem).where(OrderItem.item_id == item_id)
+                select(OrderItem).where(OrderItem.id == order_item_id)
             )).scalar_one_or_none()
             if not order_item:
                 raise OrderItemNotFound
@@ -83,23 +84,22 @@ class ShopRepository:
             await session.commit()
             return order_item
 
-    async def delete_order_item(self, item_id: int) -> None:
+    async def delete_order_item(self, order_item_id: int) -> None:
         async with self.db.SessionLocal() as session:
             await session.execute(
-                delete(OrderItem).where(OrderItem.item_id == item_id)
+                delete(OrderItem).where(OrderItem.id == order_item_id)
             )
             await session.commit()
 
-    async def create_order(self, user_id: int) -> Order:
+    async def create_order(self, user_id: int, items: list[OrderItem]) -> Order:
         async with self.db.SessionLocal() as session:
-            items = (await session.execute(
-                select(OrderItem).where(OrderItem.user_id == user_id, OrderItem.order_id.is_(None))
-            )).scalars().all()
-            if not items:
-                raise OrderItemsNotFound
+            # items = (await session.execute(
+            #     select(OrderItem).where(OrderItem.user_id == user_id, OrderItem.order_id.is_(None))
+            # )).scalars().all()
+            # if not items:
+            #     raise OrderItemsNotFound
             dt = datetime.datetime.utcnow()
             order = Order(
-                id=uuid.uuid4(),
                 user_id=user_id,
                 order_items=items,
                 status='created',
@@ -113,7 +113,11 @@ class ShopRepository:
     async def get_order(self, order_id: str) -> Order | None:
         async with self.db.SessionLocal() as session:
             order = await session.execute(select(Order).where(Order.id == order_id))
-            return order.scalar_one_or_none()
+            return order.unique().scalar_one_or_none()
+
+    async def get_all_orders_from_user(self, user_id: int):
+        async with self.db.SessionLocal() as session:
+            return (await session.execute(select(Order).where(Order.user_id == user_id))).unique().scalars().all()
 
     async def change_order_status(self, order_id: int, new_status: str) -> Order:
         async with self.db.SessionLocal() as session:
