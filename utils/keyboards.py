@@ -6,7 +6,7 @@ class KB:
 
     b_shop = InlineKeyboardButton(text='🏪 Магазин', callback_data='shop')
     b_payment = InlineKeyboardButton(text='💳 Оплата', callback_data='payment')
-    b_monitoring = InlineKeyboardButton(text='👁 Мониторинг', callback_data='monitoring')
+    b_monitoring = InlineKeyboardButton(text='👁 Мониторинг', url='https://t.me/MyCryptoInformer_bot')
     b_planning = InlineKeyboardButton(text='Бронирование времени', callback_data='planning')
     b_finances = InlineKeyboardButton(text='💰 Управление финансами', url='https://t.me/family_finances_app_bot')
     b_parser = InlineKeyboardButton(text='📝 Парсер', url='https://t.me/dnb8866_bot')
@@ -44,16 +44,20 @@ class KB:
 
 class PaymentKB(KB):
 
-    b_payment_robokassa = InlineKeyboardButton(text='Robokassa', callback_data='payment_robokassa')
-    b_payment_yookassa = InlineKeyboardButton(text='ЮKassa', callback_data='payment_yookassa')
+    b_payment_sber = InlineKeyboardButton(text='Сбер', callback_data='payment_sber')
+    b_payment_yookassa = InlineKeyboardButton(text='ЮКасса', callback_data='payment_yookassa')
+    b_payment_paymaster = InlineKeyboardButton(text='PayMaster', callback_data='payment_paymaster')
 
     b_back_to_payment = InlineKeyboardButton(text='Назад', callback_data='payment')
 
     @classmethod
-    def payment(cls, url) -> InlineKeyboardMarkup:
+    def payment(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        robokassa =  InlineKeyboardButton(text='Robokassa', web_app=WebAppInfo(url=url))
-        builder.add(robokassa, cls.b_payment_yookassa, cls.b_back_to_main)
+        builder.add(
+            cls.b_payment_sber,
+            cls.b_payment_paymaster,
+            cls.b_payment_yookassa,
+            cls.b_back_to_main)
         return builder.adjust(1).as_markup()
 
     @classmethod
@@ -67,8 +71,11 @@ class ShopKB(KB):
     b_buy = InlineKeyboardButton(text='💰 Купить', callback_data='buy')
     b_add_to_cart = InlineKeyboardButton(text='🛒 Добавить в корзину', callback_data='add_to_cart')
     b_show_cart = InlineKeyboardButton(text='🛒 Просмотреть корзину', callback_data='show_cart')
-    b_increace_amount = InlineKeyboardButton(text='+', callback_data='change_amount_1')
-    b_decreace_amount = InlineKeyboardButton(text='-', callback_data='change_amount_-1')
+    b_clean_cart = InlineKeyboardButton(text='🧹 Очистить корзину', callback_data='clean_cart')
+    b_place_order = InlineKeyboardButton(text='💰 Оплатить заказ', callback_data='place_order')
+    b_my_orders = InlineKeyboardButton(text='📋 Мои заказы', callback_data='my_orders')
+    b_increace_quantity = InlineKeyboardButton(text='+', callback_data='change_quantity_1')
+    b_decreace_quantity = InlineKeyboardButton(text='-', callback_data='change_quantity_-1')
 
     @classmethod
     def back_to_shop(cls) -> InlineKeyboardMarkup:
@@ -81,7 +88,8 @@ class ShopKB(KB):
             cls,
             categories: list[tuple[int, str]],
             prefix: str,
-            back_to_shop_button: bool = False
+            back_to_shop_button: bool = False,
+            my_orders_button: bool = False
     ) -> InlineKeyboardMarkup:
 
         builder = InlineKeyboardBuilder()
@@ -91,6 +99,8 @@ class ShopKB(KB):
             else:
                 builder.add(InlineKeyboardButton(text=text, callback_data=f'{prefix}_{id_}'))
         builder.row(cls.b_show_cart)
+        if my_orders_button:
+            builder.row(cls.b_my_orders)
         if back_to_shop_button:
             builder.row(cls.b_shop)
         builder.row(cls.b_back_to_main)
@@ -102,9 +112,13 @@ class ShopKB(KB):
         builder.add(
             cls.b_buy,
             cls.b_add_to_cart,
-            cls.b_decreace_amount, cls.b_increace_amount,
+            cls.b_decreace_quantity, cls.b_increace_quantity,
             cls.b_shop,
             cls.b_back_to_main)
         return builder.adjust(1, 1, 2, 1).as_markup()
 
-
+    @classmethod
+    def show_cart(cls):
+        builder = InlineKeyboardBuilder()
+        builder.add(cls.b_place_order, cls.b_clean_cart, cls.b_shop)
+        return builder.adjust(1).as_markup()

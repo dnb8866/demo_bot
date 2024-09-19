@@ -24,6 +24,14 @@ MAX_SESSION_TIME_SECS = 300
 
 
 """
+Payments
+"""
+SBER_TOKEN = os.getenv('SBER_TOKEN')
+YOOKASSA_TOKEN = os.getenv('YOOKASSA_TOKEN')
+PAYMASTER_TOKEN = os.getenv('PAYMASTER_TOKEN')
+
+
+"""
 REDIS
 """
 REDIS_URL = os.getenv('REDIS_URL')
