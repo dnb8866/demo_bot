@@ -93,11 +93,6 @@ class ShopRepository:
 
     async def create_order(self, user_id: int, items: list[OrderItem]) -> Order:
         async with self.db.SessionLocal() as session:
-            # items = (await session.execute(
-            #     select(OrderItem).where(OrderItem.user_id == user_id, OrderItem.order_id.is_(None))
-            # )).scalars().all()
-            # if not items:
-            #     raise OrderItemsNotFound
             dt = datetime.datetime.utcnow()
             order = Order(
                 user_id=user_id,
@@ -122,7 +117,7 @@ class ShopRepository:
     async def change_order_status(self, order_id: int, new_status: str) -> Order:
         async with self.db.SessionLocal() as session:
             order = await session.execute(select(Order).where(Order.id == order_id))
-            order = order.scalar_one_or_none()
+            order = order.unique().scalar_one_or_none()
             order.status = new_status
             order.updated = datetime.datetime.utcnow()
             await session.commit()

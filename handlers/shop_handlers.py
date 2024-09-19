@@ -5,10 +5,11 @@ from aiogram.fsm.context import FSMContext
 
 import utils.assist as assist
 import utils.texts as t
+from config import SBER_TOKEN
 from engine import shop_repo
+from engine import telegram_bot as bot
 from utils.fsm_states import ShopFsm
 from utils.keyboards import ShopKB
-from utils.models_orm import Order
 
 router = Router()
 
@@ -72,14 +73,16 @@ async def add_to_cart(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'show_cart')
-async def show_cart(callback: types.CallbackQuery):
+async def show_cart(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
     order_items = await shop_repo.get_all_order_items(callback.from_user.id, without_order=True)
     total_price = await assist.calculate_total_price_from_items(order_items)
     await callback.message.edit_text(await t.show_cart(order_items, total_price), reply_markup=ShopKB.show_cart())
 
 
 @router.callback_query(F.data == 'clean_cart')
-async def clean_cart(callback: types.CallbackQuery):
+async def clean_cart(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
     order_items = await shop_repo.get_all_order_items(callback.from_user.id, without_order=True)
     try:
         for order_item in order_items:
@@ -87,13 +90,13 @@ async def clean_cart(callback: types.CallbackQuery):
     except Exception as _e:
         # logger.error(f"{type(_e)} - {_e}")
         await callback.message.edit_text(f"Ошибка: {type(_e)} - {_e}")
-    await callback.message.edit_text('Корзина очищена', reply_markup=ShopKB.back_to_shop())
+    else:
+        await callback.message.edit_text('Корзина очищена', reply_markup=ShopKB.back_to_shop())
 
 
 @router.callback_query(F.data == 'place_order')
 async def place_order(callback: types.CallbackQuery):
     order_items = await shop_repo.get_all_order_items(callback.from_user.id, without_order=True)
-    # total_price = await assist.calculate_total_price_from_cart(order_items)
     await shop_repo.create_order(callback.from_user.id, order_items)
     await callback.message.edit_text('Заказ оформлен', reply_markup=ShopKB.back_to_shop())
 
@@ -102,3 +105,34 @@ async def place_order(callback: types.CallbackQuery):
 async def my_orders(callback: types.CallbackQuery):
     orders = await shop_repo.get_all_orders_from_user(callback.from_user.id)
     await callback.message.edit_text(await t.all_orders_from_user(orders), reply_markup=ShopKB.back_to_shop())
+
+
+@router.callback_query(F.data == 'buy')
+async def back_to_shop(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    try:
+        order_item = await shop_repo.add_order_item(callback.from_user.id, data['item_id'], data['quantity'])
+        order = await shop_repo.create_order(callback.from_user.id, [order_item])
+    except Exception as _e:
+        await callback.message.edit_text(f"Ошибка: {type(_e)} - {_e}")
+    else:
+        msg = await callback.message.edit_text(
+            'Заказ оформлен\n'
+            'Для тестовой оплаты используйте тестовую карту 4111 1111 1111 1111, '
+            '12/24, CVC/CVV 123, проверочный код 12345678',
+            reply_markup=ShopKB.back_to_shop())
+        amount = data['quantity'] * Decimal(str(data['item_price'])) * 100
+        price = types.LabeledPrice(label=data['item_name'], amount=amount)
+        if SBER_TOKEN.split(':')[1] == 'TEST':
+            await bot.send_invoice(
+                callback.message.chat.id,
+                title=f'Оплата {data['item_name']}',
+                description=f'{data['item_description']}',
+                provider_token=SBER_TOKEN,
+                currency='rub',
+                is_flexible=False,
+                prices=[price],
+                start_parameter=f'order_{order.id}',
+                payload=f'order_{order.id}'
+            )
+        await state.update_data(msg=msg.message_id)

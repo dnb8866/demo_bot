@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 
 import utils.texts as t
 from config import SBER_TOKEN, YOOKASSA_TOKEN, PAYMASTER_TOKEN
-from engine import telegram_bot as bot
+from engine import telegram_bot as bot, shop_repo
 from utils.fsm_states import PaymentFsm
 from utils.keyboards import PaymentKB, KB
 
@@ -78,5 +78,7 @@ async def process_successful_payment(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await bot.delete_message(message.chat.id, data['msg'])
     await message.answer('Платеж успешно проведен.', reply_markup=KB.back_to_main())
-    # pmnt = message.successful_payment
-    # print(pmnt)
+    prefix, *invoice_payload = message.successful_payment.invoice_payload.split('_')
+    if prefix == 'order' and invoice_payload[0].isdigit():
+        await shop_repo.change_order_status(int(invoice_payload[0]), 'paid')
+    await state.clear()
