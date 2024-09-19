@@ -122,3 +122,12 @@ class ShopKB(KB):
         builder = InlineKeyboardBuilder()
         builder.add(cls.b_place_order, cls.b_clean_cart, cls.b_shop)
         return builder.adjust(1).as_markup()
+
+
+class PlannerKB(KB):
+    b_add_slot = InlineKeyboardButton(text='Забронировать слот', callback_data='add_slot')
+    b_cancel_slot = InlineKeyboardButton(text='Отменить запись', callback_data='cancel_slot')
+    b_my_slots = InlineKeyboardButton(text='Мои записи', callback_data='my_slots')
+
+    b_for_admin = InlineKeyboardButton(text='Для владельца', callback_data='planner_for_admin')
+    b_my_schedule = InlineKeyboardButton(text='Мое расписание', callback_data='my_schedule')
