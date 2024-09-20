@@ -3,15 +3,16 @@ import pytest
 from sqlalchemy import select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
-from config import SQLALCHEMY_DATABASE_URL_TEST
+from config import SQLALCHEMY_SHOP_DB_URL_TEST
+from planner.entities import Day
 from utils.db import AlchemySqlDb
-from utils.models_orm import Base, User
+from utils.models_orm import Base, User, Event, Slot
 from utils.repositories import UserRepository
 
 
 class TestDb:
 
-    db = AlchemySqlDb(SQLALCHEMY_DATABASE_URL_TEST, Base, test=True)
+    db = AlchemySqlDb(SQLALCHEMY_SHOP_DB_URL_TEST, Base, test=True)
     dt_now = dt.datetime.utcnow()
 
     @pytest.mark.asyncio
@@ -55,7 +56,7 @@ class TestDb:
 
 
 class TestUserRepository:
-    db = AlchemySqlDb(SQLALCHEMY_DATABASE_URL_TEST, Base, test=True)
+    db = AlchemySqlDb(SQLALCHEMY_SHOP_DB_URL_TEST, Base, test=True)
     repo = UserRepository(db)
     user = User(
         id=1,
@@ -74,3 +75,26 @@ class TestUserRepository:
     async def test_get(self):
         user = await self.repo.get(self.user.id)
         assert (user.id, user.username, user.created) == (self.user.id, self.user.username, self.user.created)
+
+
+class TestPlanner:
+    event_1 = Event(name='event_1', duration=90)
+    event_2 = Event(name='event_2', duration=120)
+    event_3 = Event(name='event_3', duration=45)
+
+    slot_1 = Slot(event=event_1, start_time=dt.time(10))
+    slot_2 = Slot(event=event_2, start_time=dt.time(13))
+    slot_3 = Slot(event=event_3, start_time=dt.time(17))
+
+    def test_day_schedule(self):
+        day_schedule = Day([self.slot_1, self.slot_2, self.slot_3])
+        assert day_schedule.schedule == {
+            dt.time(9, 0): None,
+            dt.time(9, 30): None,
+            dt.time(10, 0): self.slot_1,
+            dt.time(11, 30): None,
+            dt.time(12, 0): None, dt.time(12, 30): None,
+            dt.time(13, 0): self.slot_2,
+            dt.time(16, 30): None,
+            dt.time(17, 0): self.slot_3
+        }

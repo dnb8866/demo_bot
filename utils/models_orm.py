@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date, time
 from uuid import UUID
 from sqlalchemy import ForeignKey, BigInteger, Integer
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
+
+from utils.models import SlotStatus
 
 
 class Base(DeclarativeBase):
@@ -52,7 +54,7 @@ class OrderItem(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.id'))
     item_id: Mapped[int] = mapped_column(ForeignKey('items.id'))
     item: Mapped['Item'] = relationship(lazy='joined')
-    order_id: Mapped[UUID] = mapped_column(ForeignKey('orders.id'), nullable=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), nullable=True)
     order: Mapped['Order'] = relationship(back_populates='order_items')
     quantity: Mapped[int] = mapped_column()
     created: Mapped[datetime] = mapped_column()
@@ -72,3 +74,31 @@ class Order(Base):
     status: Mapped[str] = mapped_column()
     created: Mapped[datetime] = mapped_column()
     updated: Mapped[datetime] = mapped_column()
+
+
+class Event(Base):
+    __tablename__ = 'planner_events'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column()
+    description: Mapped[str] = mapped_column()
+    duration: Mapped[int] = mapped_column()
+
+
+class Slot(Base):
+    __tablename__ = 'planner_slots'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.id'))
+    user: Mapped['User'] = relationship(lazy='joined')
+    event_id: Mapped[int] = mapped_column(ForeignKey('planner_events.id'))
+    event: Mapped['Event'] = relationship(lazy='joined')
+    start_date: Mapped[date] = mapped_column()
+    start_time: Mapped[time] = mapped_column()
+    status: Mapped[SlotStatus] = mapped_column()
+    created: Mapped[datetime] = mapped_column()
+    updated: Mapped[datetime] = mapped_column()
+
+    def __repr__(self):
+        return (f'Slot(id={self.id}, user_id={self.user_id}, event_id={self.event_id}, start_date={self.start_date}, '
+                f'start_time={self.start_time}, status={self.status}, created={self.created}, updated={self.updated})')

@@ -5,7 +5,7 @@ from sqlalchemy import select, delete, update
 
 from utils.db import AlchemySqlDb
 from utils.exceptions import OrderItemsNotFound, OrderItemNotFound
-from utils.models_orm import OrderItem, Order, User, Category, Item
+from utils.models_orm import OrderItem, Order, User, Category, Item, Event, Slot
 
 
 class UserRepository:
@@ -138,3 +138,24 @@ class ShopRepository:
     async def get_item(self, item_id: int) -> Item | None:
         async with self.db.SessionLocal() as session:
             return (await session.execute(select(Item).where(Item.id == item_id))).scalar_one_or_none()
+
+
+class PlannerRepository:
+    def __init__(self, db: AlchemySqlDb):
+        self.db = db
+
+    async def add_event(self, event: Event) -> Event:
+        async with self.db.SessionLocal() as session:
+            session.add(event)
+            await session.commit()
+            return event
+
+    async def add_slot(self, slot: Slot) -> Slot:
+        async with self.db.SessionLocal() as session:
+            session.add(slot)
+            await session.commit()
+            return slot
+
+    async def get_slot(self, slot_id: int) -> Slot | None:
+        async with self.db.SessionLocal() as session:
+            return (await session.execute(select(Slot).where(Slot.id == slot_id))).scalar_one_or_none()
