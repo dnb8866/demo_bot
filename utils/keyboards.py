@@ -7,7 +7,7 @@ class KB:
     b_shop = InlineKeyboardButton(text='🏪 Магазин', callback_data='shop')
     b_payment = InlineKeyboardButton(text='💳 Оплата', callback_data='payment')
     b_monitoring = InlineKeyboardButton(text='👁 Мониторинг', url='https://t.me/MyCryptoInformer_bot')
-    b_planning = InlineKeyboardButton(text='Бронирование времени', callback_data='planning')
+    b_planner = InlineKeyboardButton(text='Бронирование времени', callback_data='planner')
     b_finances = InlineKeyboardButton(text='💰 Управление финансами', url='https://t.me/family_finances_app_bot')
     b_parser = InlineKeyboardButton(text='📝 Парсер', url='https://t.me/dnb8866_bot')
     b_questions = InlineKeyboardButton(text='📍 Опрос', callback_data='questions')
@@ -23,7 +23,7 @@ class KB:
         builder = InlineKeyboardBuilder()
         builder.row(cls.b_shop, cls.b_payment)
         builder.row(cls.b_monitoring, cls.b_parser)
-        builder.row(cls.b_planning)
+        builder.row(cls.b_planner)
         builder.row(cls.b_finances)
         builder.row(cls.b_questions, cls.b_moderate)
         builder.row(cls.b_admin)
@@ -130,4 +130,15 @@ class PlannerKB(KB):
     b_my_slots = InlineKeyboardButton(text='Мои записи', callback_data='my_slots')
 
     b_for_admin = InlineKeyboardButton(text='Для владельца', callback_data='planner_for_admin')
+    b_for_client = InlineKeyboardButton(text='Для клиента', callback_data='planner_for_client')
+
     b_my_schedule = InlineKeyboardButton(text='Мое расписание', callback_data='my_schedule')
+
+    b_back_to_planner = InlineKeyboardButton(text='Назад', callback_data='planner')
+
+    @classmethod
+    def main(cls):
+        builder = InlineKeyboardBuilder()
+        builder.row(cls.b_for_client, cls.b_for_admin, cls.b_back_to_main)
+        return builder.adjust(1).as_markup()
+

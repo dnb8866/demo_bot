@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from config import SQLALCHEMY_SHOP_DB_URL_TEST
 from planner.entities import Day
+from utils.constants import PLANNER_DAY_SCHEDULE
 from utils.db import AlchemySqlDb
 from utils.models_orm import Base, User, Event, Slot
 from utils.repositories import UserRepository
@@ -82,19 +83,32 @@ class TestPlanner:
     event_2 = Event(name='event_2', duration=120)
     event_3 = Event(name='event_3', duration=45)
 
-    slot_1 = Slot(event=event_1, start_time=dt.time(10))
-    slot_2 = Slot(event=event_2, start_time=dt.time(13))
-    slot_3 = Slot(event=event_3, start_time=dt.time(17))
+    slot_1 = Slot(event=event_1, start_date=dt.date(2024, 1, 1),start_time=dt.time(10))
+    slot_2 = Slot(event=event_2, start_date=dt.date(2024, 1, 1), start_time=dt.time(13))
+    slot_3 = Slot(event=event_3, start_date=dt.date(2024, 1, 1), start_time=dt.time(17))
+    slot_4 = Slot(event=event_1, start_date=dt.date(2024, 1, 2), start_time=dt.time(12))
 
     def test_day_schedule(self):
-        day_schedule = Day([self.slot_1, self.slot_2, self.slot_3])
-        assert day_schedule.schedule == {
+        day = Day([self.slot_1, self.slot_2, self.slot_3])
+        assert day.schedule == {
             dt.time(9, 0): None,
             dt.time(9, 30): None,
             dt.time(10, 0): self.slot_1,
             dt.time(11, 30): None,
-            dt.time(12, 0): None, dt.time(12, 30): None,
+            dt.time(12, 0): None,
+            dt.time(12, 30): None,
             dt.time(13, 0): self.slot_2,
+            dt.time(15, 0): None,
+            dt.time(15, 30): None,
+            dt.time(16, 0): None,
             dt.time(16, 30): None,
             dt.time(17, 0): self.slot_3
         }
+
+    def test_check_many_dates(self):
+        with pytest.raises(ValueError, match='Список слотов содержит более 1 даты.'):
+            Day([self.slot_1, self.slot_2, self.slot_3, self.slot_4])
+
+    def test_check_no_date(self):
+        day = Day([])
+        assert day.schedule == PLANNER_DAY_SCHEDULE

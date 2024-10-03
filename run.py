@@ -3,7 +3,12 @@ import asyncio
 from aiogram import Dispatcher
 
 from engine import telegram_bot, redis_storage, shop_repo
-from handlers import main_handlers, payment_handlers, shop_handlers
+from handlers import (
+    main_handlers,
+    payment_handlers,
+    planner_handlers,
+    shop_handlers
+)
 
 
 async def main():
@@ -11,6 +16,7 @@ async def main():
     dp.include_routers(
         main_handlers.router,
         payment_handlers.router,
+        planner_handlers.router,
         shop_handlers.router
     )
     await shop_repo.db.prepare()
