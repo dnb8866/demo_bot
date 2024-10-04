@@ -21,6 +21,11 @@ async def admin(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(await t.planner_welcome(), reply_markup=KB.back_to_main())
 
 
+@router.callback_query(F.data == 'available_dates')
+async def available_dates(callback: types.CallbackQuery, state: FSMContext):
+    pass
+
+
 @router.callback_query(F.data == 'planner_for_client')
 async def client(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(await t.planner_welcome(), reply_markup=KB.back_to_main())

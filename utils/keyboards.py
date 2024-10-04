@@ -130,6 +130,8 @@ class PlannerKB(KB):
     b_my_slots = InlineKeyboardButton(text='Мои записи', callback_data='my_slots')
 
     b_for_admin = InlineKeyboardButton(text='Для владельца', callback_data='planner_for_admin')
+    b_edit_available_dates = InlineKeyboardButton(text='Даты для записи', callback_data='available_dates')
+
     b_for_client = InlineKeyboardButton(text='Для клиента', callback_data='planner_for_client')
 
     b_my_schedule = InlineKeyboardButton(text='Мое расписание', callback_data='my_schedule')

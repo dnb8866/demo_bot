@@ -1,18 +1,14 @@
 import asyncio
-import datetime
 import logging
 import sys
-import uuid
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.redis import RedisStorage
 from sqlalchemy import select
-from sqlalchemy.dialects.postgresql import insert
 
 import config
 from utils.db import AlchemySqlDb
-from utils.models import SlotStatus
 from utils.models_orm import Base
 from utils.repositories import ShopRepository, UserRepository, PlannerRepository
 
@@ -21,18 +17,55 @@ redis_storage = RedisStorage.from_url(config.REDIS_URL, state_ttl=config.STATE_T
 logging.basicConfig(level=config.LOG_LEVEL, stream=sys.stdout)
 
 db = AlchemySqlDb(config.SQLALCHEMY_SHOP_DB_URL, Base)
-# planner_db = AlchemySqlDb(config.SQLALCHEMY_PLANNER_DB_URL, BasePlanner)
 
 user_repo = UserRepository(db)
 shop_repo = ShopRepository(db)
 planner_repo = PlannerRepository(db)
 
 
-async def main():
+# async def main():
+#
+#     from utils.models_orm import User, Item, Category, OrderItem, Order, Slot, Event, AvailableDate
+#     import datetime as dt
+#
+#     dt_1 = dt.datetime.utcnow()
 
-    from utils.models_orm import User, Item, Category, OrderItem, Order, Slot, Event
-    slot = await planner_repo.get_slot(2)
-    print(slot)
+    # user_1 = User(firstname='Denis', created=dt_1, updated=dt_1)
+    #
+    # event_1 = Event(name='event_1', duration=90, description='event_1')
+    # event_2 = Event(name='event_2', duration=120, description='event_2')
+    # event_3 = Event(name='event_3', duration=45, description='event_2')
+    #
+    # date_1 = AvailableDate(event_date=dt.date(2024, 1, 1))
+    # date_2 = AvailableDate(event_date=dt.date(2024, 1, 2))
+    #
+    # slot_1 = Slot(event=event_1, start_date=date_1, start_time=dt.time(10), user=user_1, status=SlotStatus.PENDING, created=dt_1, updated=dt_1)
+    # slot_2 = Slot(event=event_2, start_date=date_1, start_time=dt.time(13), user=user_1, status=SlotStatus.PENDING, created=dt_1, updated=dt_1)
+    # slot_3 = Slot(event=event_3, start_date=date_1, start_time=dt.time(17), user=user_1, status=SlotStatus.PENDING, created=dt_1, updated=dt_1)
+    # slot_4 = Slot(event=event_1, start_date=date_2, start_time=dt.time(12), user=user_1, status=SlotStatus.PENDING, created=dt_1, updated=dt_1)
+
+    # async with db.SessionLocal() as session:
+        # session.add(date_1)
+        # session.add(date_2)
+        # session.add(event_1)
+        # session.add(event_2)
+        # session.add(event_3)
+        # session.add(slot_1)
+        # session.add(slot_2)
+        # session.add(slot_3)
+        # session.add(slot_4)
+        # await session.commit()
+
+        # slot_orm = (await session.execute(
+        #     select(Slot).where(Slot.id == 4)
+        # )).unique().scalar_one_or_none()
+        # print(slot_orm.status)
+        #
+        # day_orm = (await session.execute(
+        #     select(AvailableDate).where(AvailableDate.event_date == dt.date(2024, 1, 3))
+        # )).unique().scalar_one_or_none()
+        # print(day_orm.slots)
+
     # event = Event(name='Стрижка', description='Описание', duration=60)
     # event = await planner_repo.add_event(event)
     # dt = datetime.datetime.utcnow()

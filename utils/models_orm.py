@@ -1,5 +1,4 @@
 from datetime import datetime, date, time
-from uuid import UUID
 from sqlalchemy import ForeignKey, BigInteger, Integer
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 
@@ -85,6 +84,17 @@ class Event(Base):
     duration: Mapped[int] = mapped_column()
 
 
+class AvailableDate(Base):
+    __tablename__ = 'planner_available_date'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    event_date: Mapped[date] = mapped_column()
+    slots: Mapped[list['Slot']] = relationship(lazy='joined')
+
+    def __repr__(self):
+        return f'AvailableDate(id={self.id}, event_date={self.event_date})'
+
+
 class Slot(Base):
     __tablename__ = 'planner_slots'
 
@@ -93,7 +103,8 @@ class Slot(Base):
     user: Mapped['User'] = relationship(lazy='joined')
     event_id: Mapped[int] = mapped_column(ForeignKey('planner_events.id'))
     event: Mapped['Event'] = relationship(lazy='joined')
-    start_date: Mapped[date] = mapped_column()
+    start_date_id: Mapped[int] = mapped_column(ForeignKey('planner_available_date.id'))
+    start_date: Mapped[AvailableDate] = relationship(back_populates='slots', lazy='joined')
     start_time: Mapped[time] = mapped_column()
     status: Mapped[SlotStatus] = mapped_column()
     created: Mapped[datetime] = mapped_column()

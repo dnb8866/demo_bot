@@ -7,7 +7,7 @@ from config import SQLALCHEMY_SHOP_DB_URL_TEST
 from planner.entities import Day
 from utils.constants import PLANNER_DAY_SCHEDULE
 from utils.db import AlchemySqlDb
-from utils.models_orm import Base, User, Event, Slot
+from utils.models_orm import Base, User, Event, Slot, AvailableDate
 from utils.repositories import UserRepository
 
 
@@ -83,10 +83,13 @@ class TestPlanner:
     event_2 = Event(name='event_2', duration=120)
     event_3 = Event(name='event_3', duration=45)
 
-    slot_1 = Slot(event=event_1, start_date=dt.date(2024, 1, 1),start_time=dt.time(10))
-    slot_2 = Slot(event=event_2, start_date=dt.date(2024, 1, 1), start_time=dt.time(13))
-    slot_3 = Slot(event=event_3, start_date=dt.date(2024, 1, 1), start_time=dt.time(17))
-    slot_4 = Slot(event=event_1, start_date=dt.date(2024, 1, 2), start_time=dt.time(12))
+    date_1 = AvailableDate(event_date=dt.date(2024, 1, 1))
+    date_2 = AvailableDate(event_date=dt.date(2024, 1, 2))
+
+    slot_1 = Slot(event=event_1, start_date=date_1, start_time=dt.time(10))
+    slot_2 = Slot(event=event_2, start_date=date_1, start_time=dt.time(13))
+    slot_3 = Slot(event=event_3, start_date=date_1, start_time=dt.time(17))
+    slot_4 = Slot(event=event_1, start_date=date_2, start_time=dt.time(12))
 
     def test_day_schedule(self):
         day = Day([self.slot_1, self.slot_2, self.slot_3])

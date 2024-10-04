@@ -1,11 +1,11 @@
 import datetime
 import uuid
 
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, extract
 
 from utils.db import AlchemySqlDb
 from utils.exceptions import OrderItemsNotFound, OrderItemNotFound
-from utils.models_orm import OrderItem, Order, User, Category, Item, Event, Slot
+from utils.models_orm import OrderItem, Order, User, Category, Item, Event, Slot, AvailableDate
 
 
 class UserRepository:
@@ -110,7 +110,7 @@ class ShopRepository:
             order = await session.execute(select(Order).where(Order.id == order_id))
             return order.unique().scalar_one_or_none()
 
-    async def get_all_orders_from_user(self, user_id: int):
+    async def get_all_orders_from_user(self, user_id: int) -> list[Order] | None:
         async with self.db.SessionLocal() as session:
             return (await session.execute(select(Order).where(Order.user_id == user_id))).unique().scalars().all()
 
@@ -121,6 +121,7 @@ class ShopRepository:
             order.status = new_status
             order.updated = datetime.datetime.utcnow()
             await session.commit()
+            return order
 
     async def delete_order(self, order_id: str) -> None:
         async with self.db.SessionLocal() as session:
@@ -150,6 +151,31 @@ class PlannerRepository:
             await session.commit()
             return event
 
+    async def get_event(self, event_id: int):
+        async with self.db.SessionLocal() as session:
+            return (await session.execute(select(Event).where(Event.id == event_id))).scalar_one_or_none()
+
+    async def update_event(self, event: Event) -> Event:
+        async with self.db.SessionLocal() as session:
+            event.updated = datetime.datetime.utcnow()
+            await session.execute(
+                update(Event)
+                .values(
+                    name=event.name,
+                    description=event.description,
+                    duration=event.duration,
+                    updated=event.updated,
+                )
+                .where(Event.id == event.id)
+            )
+            await session.commit()
+            return event
+
+    async def delete_event(self, event_id: int) -> None:
+        async with self.db.SessionLocal() as session:
+            await session.execute(delete(Event).where(Event.id == event_id))
+            await session.commit()
+
     async def add_slot(self, slot: Slot) -> Slot:
         async with self.db.SessionLocal() as session:
             session.add(slot)
@@ -159,3 +185,48 @@ class PlannerRepository:
     async def get_slot(self, slot_id: int) -> Slot | None:
         async with self.db.SessionLocal() as session:
             return (await session.execute(select(Slot).where(Slot.id == slot_id))).scalar_one_or_none()
+
+    async def get_slots_for_user(self, user_id: int) -> list[Slot] | None:
+        async with self.db.SessionLocal() as session:
+            return (await session.execute(select(Slot).where(Slot.user_id == user_id))).scalars().all()
+
+    async def update_slot(self, slot: Slot) -> Slot:
+        async with self.db.SessionLocal() as session:
+            slot.updated = datetime.datetime.utcnow()
+            await session.execute(
+                update(Slot)
+                .values(
+                    user_id=slot.user_id,
+                    event_id=slot.event_id,
+                    start_date_id=slot.start_date_id,
+                    start_time=slot.start_time,
+                    status=slot.status,
+                    updated=slot.updated,
+                )
+                .where(Slot.id == slot.id)
+            )
+            await session.commit()
+            return slot
+
+    async def delete_slot(self, slot_id: int) -> None:
+        async with self.db.SessionLocal() as session:
+            await session.execute(delete(Slot).where(Slot.id == slot_id))
+            await session.commit()
+
+    async def add_available_date(self, available_date: AvailableDate) -> AvailableDate | None:
+        async with self.db.SessionLocal() as session:
+            session.add(available_date)
+            await session.commit()
+            return available_date
+
+    async def get_all_available_dates(self, month: int, year: int):
+        async with self.db.SessionLocal() as session:
+            return await session.execute(select(AvailableDate).filter(
+                extract('year', AvailableDate.event_date) == year),
+                extract('month', AvailableDate.event_date) == month
+            )
+
+    async def delete_available_date(self, available_date: datetime.date):
+        async with self.db.SessionLocal() as session:
+            await session.execute(delete(AvailableDate).where(AvailableDate.event_date == available_date))
+            await session.commit()
