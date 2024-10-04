@@ -111,5 +111,5 @@ class Slot(Base):
     updated: Mapped[datetime] = mapped_column()
 
     def __repr__(self):
-        return (f'Slot(id={self.id}, user_id={self.user_id}, event_id={self.event_id}, start_date={self.start_date}, '
+        return (f'Slot(id={self.id}, user_id={self.user_id}, event={self.event}, start_date={self.start_date}, '
                 f'start_time={self.start_time}, status={self.status}, created={self.created}, updated={self.updated})')
