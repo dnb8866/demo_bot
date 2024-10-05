@@ -89,6 +89,7 @@ class AvailableDate(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     event_date: Mapped[date] = mapped_column()
+    available: Mapped[bool] = mapped_column(default=True)
     slots: Mapped[list['Slot']] = relationship(lazy='joined')
 
     def __repr__(self):

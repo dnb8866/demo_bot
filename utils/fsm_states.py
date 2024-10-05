@@ -8,3 +8,8 @@ class PaymentFsm(StatesGroup):
 class ShopFsm(StatesGroup):
     item_info = State()
     test = State()
+
+
+class PlannerFsm(StatesGroup):
+    edit_available_dates = State()
+    get_dates = State()

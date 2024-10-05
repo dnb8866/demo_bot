@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 from sqlalchemy import select, delete, update, extract
 
@@ -221,10 +220,11 @@ class PlannerRepository:
 
     async def get_all_available_dates(self, month: int, year: int):
         async with self.db.SessionLocal() as session:
-            return await session.execute(select(AvailableDate).filter(
-                extract('year', AvailableDate.event_date) == year),
-                extract('month', AvailableDate.event_date) == month
-            )
+            return (await session.execute(
+                select(AvailableDate).where(
+                    extract('year', AvailableDate.event_date) == year,
+                    extract('month', AvailableDate.event_date) == month
+                ))).unique().scalars().all()
 
     async def delete_available_date(self, available_date: datetime.date):
         async with self.db.SessionLocal() as session:

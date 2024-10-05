@@ -1,7 +1,25 @@
+from datetime import datetime
 from decimal import Decimal
 
+from sqlalchemy import extract
+
 import utils.assist as assist
-from utils.models_orm import Item, OrderItem
+from utils.models_orm import OrderItem, AvailableDate
+
+MONTH_TEXT = {
+    1: 'Январь',
+    2: 'Февраль',
+    3: 'Март',
+    4: 'Апрель',
+    5: 'Май',
+    6: 'Июнь',
+    7: 'Июль',
+    8: 'Август',
+    9: 'Сентябрь',
+    10: 'Октябрь',
+    11: 'Ноябрь',
+    12: 'Декабрь'
+}
 
 
 async def main(name):
@@ -69,3 +87,39 @@ async def payment_description():
 async def planner_welcome():
     return ('Планируйте свое время, записывайте клиентов в свободные слоты.\n\n'
             'Гибкая настройка под ваши потребности.')
+
+
+async def planner_available_dates(
+        current_month: tuple[AvailableDate],
+        next_month: tuple[AvailableDate]
+):
+    dt = datetime.now()
+    text = [
+        f'Открытые даты для записи в текущем месяце ({MONTH_TEXT[dt.month]} {dt.year}):\n'
+    ]
+    temp = []
+    for date in current_month:
+        temp.append(str(date.event_date.day))
+    text.append(', '.join(temp))
+    temp.clear()
+    next_month_number = dt.month + 1 if dt.month < 12 else 1
+    year = dt.year if dt.month < 12 else dt.year + 1
+    text.append(
+        f'\n\nОткрытые даты для записи в следующем месяце ({MONTH_TEXT[next_month_number]} {year}):\n'
+    )
+    for date in next_month:
+        temp.append(str(date.event_date.day))
+    text.append(', '.join(temp))
+    return ''.join(text)
+
+
+def planner_choose_month():
+    return '👇 Выберите месяц для редактирования расписания: 👇'
+
+
+def planner_get_dates(type_operation):
+    if type_operation == 'add':
+        return '👇 Введите числа месяца (в эти дни для клиентов станет доступна запись) 👇'
+    elif type_operation == 'remove':
+        return '👇 Введите числа месяца (в эти дни для клиентов будет невозможна запись) 👇'
+

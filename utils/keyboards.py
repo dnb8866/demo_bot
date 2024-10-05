@@ -118,29 +118,80 @@ class ShopKB(KB):
         return builder.adjust(1, 1, 2, 1).as_markup()
 
     @classmethod
-    def show_cart(cls):
+    def show_cart(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         builder.add(cls.b_place_order, cls.b_clean_cart, cls.b_shop)
         return builder.adjust(1).as_markup()
 
 
 class PlannerKB(KB):
+
+    b_for_admin = InlineKeyboardButton(text='Для владельца', callback_data='planner_for_admin')
+    b_edit_available_dates = InlineKeyboardButton(text='Редактировать даты', callback_data='edit_available_dates')
+    b_current_month = InlineKeyboardButton(text='В текущий месяц', callback_data='p_current_month')
+    b_next_month = InlineKeyboardButton(text='В следующий месяц', callback_data='p_next_month')
+    b_add_available_dates = InlineKeyboardButton(text='Добавить даты', callback_data='add_available_dates')
+    b_remove_available_dates = InlineKeyboardButton(text='Удалить даты', callback_data='remove_available_dates')
+    b_show_slots = InlineKeyboardButton(text='Показать записи', callback_data='show_slots')
+    b_accept_slots = InlineKeyboardButton(text='Подтвердить записи', callback_data='accept_slots')
+    b_reject_slots = InlineKeyboardButton(text='Отменить записи', callback_data='reject_slots')
+
+    b_for_client = InlineKeyboardButton(text='Для клиента', callback_data='planner_for_client')
     b_add_slot = InlineKeyboardButton(text='Забронировать слот', callback_data='add_slot')
     b_cancel_slot = InlineKeyboardButton(text='Отменить запись', callback_data='cancel_slot')
     b_my_slots = InlineKeyboardButton(text='Мои записи', callback_data='my_slots')
 
-    b_for_admin = InlineKeyboardButton(text='Для владельца', callback_data='planner_for_admin')
-    b_edit_available_dates = InlineKeyboardButton(text='Даты для записи', callback_data='available_dates')
-
-    b_for_client = InlineKeyboardButton(text='Для клиента', callback_data='planner_for_client')
-
-    b_my_schedule = InlineKeyboardButton(text='Мое расписание', callback_data='my_schedule')
-
     b_back_to_planner = InlineKeyboardButton(text='Назад', callback_data='planner')
 
     @classmethod
-    def main(cls):
+    def main(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         builder.row(cls.b_for_client, cls.b_for_admin, cls.b_back_to_main)
         return builder.adjust(1).as_markup()
 
+    @classmethod
+    def main_admin(cls) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(
+            cls.b_edit_available_dates,
+            cls.b_show_slots,
+            cls.b_accept_slots,
+            cls.b_reject_slots,
+            cls.b_back_to_planner,
+            cls.b_back_to_main
+        )
+        return builder.adjust(1).as_markup()
+
+    @classmethod
+    def main_client(cls) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(
+            cls.b_add_slot,
+            cls.b_cancel_slot,
+            cls.b_my_slots,
+            cls.b_back_to_planner,
+            cls.b_back_to_main
+        )
+        return builder.adjust(1).as_markup()
+
+    @classmethod
+    def edit_available_dates(cls) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(
+            cls.b_add_available_dates,
+            cls.b_remove_available_dates,
+            cls.b_back_to_planner,
+            cls.b_back_to_main
+        )
+        return builder.adjust(1).as_markup()
+
+    @classmethod
+    def choose_month(cls) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(
+            cls.b_current_month,
+            cls.b_next_month,
+            cls.b_back_to_planner,
+            cls.b_back_to_main
+        )
+        return builder.adjust(1).as_markup()
