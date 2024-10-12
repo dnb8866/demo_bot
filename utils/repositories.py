@@ -3,8 +3,8 @@ import datetime
 from sqlalchemy import select, delete, update, extract
 
 from utils.db import AlchemySqlDb
-from utils.exceptions import OrderItemsNotFound, OrderItemNotFound
-from utils.models_orm import OrderItem, Order, User, Category, Item, Event, Slot, AvailableDate
+from utils.exceptions import OrderItemNotFound
+from utils.models_orm import OrderItem, Order, User, Category, Item, Event, Slot, SlotDate
 
 
 class UserRepository:
@@ -197,7 +197,7 @@ class PlannerRepository:
                 .values(
                     user_id=slot.user_id,
                     event_id=slot.event_id,
-                    start_date_id=slot.start_date_id,
+                    slot_date=slot.slot_date,
                     start_time=slot.start_time,
                     status=slot.status,
                     updated=slot.updated,
@@ -212,21 +212,21 @@ class PlannerRepository:
             await session.execute(delete(Slot).where(Slot.id == slot_id))
             await session.commit()
 
-    async def add_available_date(self, available_date: AvailableDate) -> AvailableDate | None:
+    async def add_available_date(self, slot_date: SlotDate) -> SlotDate | None:
         async with self.db.SessionLocal() as session:
-            session.add(available_date)
+            session.add(slot_date)
             await session.commit()
-            return available_date
+            return slot_date
 
     async def get_all_available_dates(self, month: int, year: int):
         async with self.db.SessionLocal() as session:
             return (await session.execute(
-                select(AvailableDate).where(
-                    extract('year', AvailableDate.event_date) == year,
-                    extract('month', AvailableDate.event_date) == month
+                select(SlotDate).where(
+                    extract('year', SlotDate.slot_date) == year,
+                    extract('month', SlotDate.slot_date) == month
                 ))).unique().scalars().all()
 
-    async def delete_available_date(self, available_date: datetime.date):
+    async def delete_available_date(self, slot_date: datetime.date):
         async with self.db.SessionLocal() as session:
-            await session.execute(delete(AvailableDate).where(AvailableDate.event_date == available_date))
+            await session.execute(delete(SlotDate).where(SlotDate.slot_date == slot_date))
             await session.commit()

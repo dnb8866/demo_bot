@@ -1,10 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import extract
 
 import utils.assist as assist
-from utils.models_orm import OrderItem, AvailableDate
+from utils.models_orm import OrderItem, SlotDate
 
 MONTH_TEXT = {
     1: 'Январь',
@@ -90,8 +89,8 @@ async def planner_welcome():
 
 
 async def planner_available_dates(
-        current_month: tuple[AvailableDate],
-        next_month: tuple[AvailableDate]
+        current_month: tuple[SlotDate],
+        next_month: tuple[SlotDate]
 ):
     dt = datetime.now()
     text = [
@@ -99,7 +98,7 @@ async def planner_available_dates(
     ]
     temp = []
     for date in current_month:
-        temp.append(str(date.event_date.day))
+        temp.append(str(date.slot_date.day))
     text.append(', '.join(temp))
     temp.clear()
     next_month_number = dt.month + 1 if dt.month < 12 else 1
@@ -108,7 +107,7 @@ async def planner_available_dates(
         f'\n\nОткрытые даты для записи в следующем месяце ({MONTH_TEXT[next_month_number]} {year}):\n'
     )
     for date in next_month:
-        temp.append(str(date.event_date.day))
+        temp.append(str(date.slot_date.day))
     text.append(', '.join(temp))
     return ''.join(text)
 

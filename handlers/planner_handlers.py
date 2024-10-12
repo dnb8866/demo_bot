@@ -57,7 +57,10 @@ async def set_month(callback: types.CallbackQuery, state: FSMContext):
     elif callback.data == 'p_next_month':
         await state.update_data(month='next')
     await state.set_state(PlannerFsm.get_dates)
-    await callback.message.edit_text(await t.planner_enter_date(), reply_markup=KB.calendar())
+    await callback.message.edit_text(
+        await t.planner_get_dates((await state.get_data())['type_data']),
+        reply_markup=PlannerKB.back_to_planner()
+    )
 
 
 @router.callback_query(F.data == 'show_slots')

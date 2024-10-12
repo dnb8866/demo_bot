@@ -144,6 +144,12 @@ class PlannerKB(KB):
     b_back_to_planner = InlineKeyboardButton(text='Назад', callback_data='planner')
 
     @classmethod
+    def back_to_planner(cls) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(cls.b_back_to_planner, cls.b_back_to_main)
+        return builder.adjust(1).as_markup()
+
+    @classmethod
     def main(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         builder.row(cls.b_for_client, cls.b_for_admin, cls.b_back_to_main)

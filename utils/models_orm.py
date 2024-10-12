@@ -84,16 +84,16 @@ class Event(Base):
     duration: Mapped[int] = mapped_column()
 
 
-class AvailableDate(Base):
-    __tablename__ = 'planner_available_date'
+class SlotDate(Base):
+    __tablename__ = 'planner_dates'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    event_date: Mapped[date] = mapped_column()
-    available: Mapped[bool] = mapped_column(default=True)
+    slot_date: Mapped[date] = mapped_column()
+    published: Mapped[bool] = mapped_column(default=True)
     slots: Mapped[list['Slot']] = relationship(lazy='joined')
 
     def __repr__(self):
-        return f'AvailableDate(id={self.id}, event_date={self.event_date})'
+        return f'SlotDate(id={self.id}, slot_date={self.slot_date})'
 
 
 class Slot(Base):
@@ -104,13 +104,13 @@ class Slot(Base):
     user: Mapped['User'] = relationship(lazy='joined')
     event_id: Mapped[int] = mapped_column(ForeignKey('planner_events.id'))
     event: Mapped['Event'] = relationship(lazy='joined')
-    start_date_id: Mapped[int] = mapped_column(ForeignKey('planner_available_date.id'))
-    start_date: Mapped[AvailableDate] = relationship(back_populates='slots', lazy='joined')
+    slot_date_id: Mapped[int] = mapped_column(ForeignKey('planner_dates.id'))
+    slot_date: Mapped[SlotDate] = relationship(back_populates='slots', lazy='joined')
     start_time: Mapped[time] = mapped_column()
     status: Mapped[SlotStatus] = mapped_column()
     created: Mapped[datetime] = mapped_column()
     updated: Mapped[datetime] = mapped_column()
 
     def __repr__(self):
-        return (f'Slot(id={self.id}, user_id={self.user_id}, event={self.event}, start_date={self.start_date}, '
+        return (f'Slot(id={self.id}, user_id={self.user_id}, event={self.event}, start_date={self.slot_date}, '
                 f'start_time={self.start_time}, status={self.status}, created={self.created}, updated={self.updated})')

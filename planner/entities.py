@@ -18,7 +18,7 @@ class Day:
     def _check_slots(slots: list[Slot]) -> bool:
         dates = set()
         for slot in slots:
-            dates.add(slot.start_date.event_date)
+            dates.add(slot.slot_date.slot_date)
             if len(dates) > 1:
                 # logger.error()
                 return False
@@ -35,7 +35,7 @@ class Day:
         if not self._check_slots(slots):
             # logger.error()
             raise ValueError('Список слотов содержит более 1 даты.')
-        self.date = slots[0].start_date.event_date
+        self.date = slots[0].slot_date.slot_date
         for slot in slots:
             self._delete_used_slot(slot)
             self.schedule[slot.start_time] = slot
