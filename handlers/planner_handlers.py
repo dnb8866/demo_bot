@@ -62,6 +62,10 @@ async def set_month(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=PlannerKB.back_to_planner()
     )
 
+@router.callback_query(PlannerFsm.get_dates)
+async def set_dates(callback: types.CallbackQuery, state: FSMContext):
+    pass
+
 
 @router.callback_query(F.data == 'show_slots')
 async def show_slots(callback: types.CallbackQuery, state: FSMContext):
