@@ -13,3 +13,4 @@ class ShopFsm(StatesGroup):
 class PlannerFsm(StatesGroup):
     edit_available_dates = State()
     get_dates = State()
+    get_date_for_show = State()

@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
+from sqlalchemy.testing.plugin.plugin_base import logging
 
 import utils.assist as assist
 from utils.models_orm import OrderItem, SlotDate
@@ -118,7 +119,29 @@ async def planner_choose_month():
 
 async def planner_get_dates(type_operation):
     if type_operation == 'add':
-        return '👇 Введите числа месяца (в эти дни для клиентов станет доступна запись) 👇'
+        return ('👇 Введите числа месяца через запятую, например 2, 3, 5 '
+                '(в эти дни для клиентов станет доступна запись) 👇')
     elif type_operation == 'remove':
-        return '👇 Введите числа месяца (в эти дни для клиентов будет невозможна запись) 👇'
+        return ('👇 Введите числа месяца через запятую, например 2, 3, 5 '
+                '(в эти дни для клиентов будет невозможна запись) 👇')
+    logging.error('planner_get_dates: параметр type_operation имеет некорректное значение.')
+    return 'Ошибка. Попробуйте позже.'
 
+
+async def success_change_dates(type_operation):
+    if type_operation == 'add':
+        return '(ДЕМО) Успешно добавлены даты для записи!'
+    elif type_operation == 'remove':
+        return '(ДЕМО) Успешно удалены даты для записи!'
+    logging.error('success_change_dates: параметр type_operation имеет некорректное значение.')
+    return 'Ошибка. Попробуйте позже.'
+
+
+async def invalid_dates(type_operation):
+    if type_operation == 'add':
+        return ('Введены некорректные значения. Попробуйте заново.\n\n'
+                f'{await planner_get_dates(type_operation)}')
+    elif type_operation =='remove':
+        return ('Введены некорректные значения. Попробуйте заново.'
+                f'{await planner_get_dates(type_operation)}')
+    return 'Ошибка. Попробуйте позже.'
