@@ -12,6 +12,7 @@ from handlers import (
 
 
 async def main():
+    # loop = asyncio.get_running_loop()
     dp = Dispatcher(storage=redis_storage)
     dp.include_routers(
         main_handlers.router,

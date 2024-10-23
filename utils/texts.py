@@ -112,11 +112,11 @@ async def planner_available_dates(
     return ''.join(text)
 
 
-def planner_choose_month():
+async def planner_choose_month():
     return '👇 Выберите месяц для редактирования расписания: 👇'
 
 
-def planner_get_dates(type_operation):
+async def planner_get_dates(type_operation):
     if type_operation == 'add':
         return '👇 Введите числа месяца (в эти дни для клиентов станет доступна запись) 👇'
     elif type_operation == 'remove':

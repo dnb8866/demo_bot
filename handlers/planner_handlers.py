@@ -4,10 +4,9 @@ from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 
 import utils.texts as t
-from config import SBER_TOKEN, YOOKASSA_TOKEN, PAYMASTER_TOKEN
-from engine import telegram_bot as bot, shop_repo, planner_repo
-from utils.fsm_states import PaymentFsm, PlannerFsm
-from utils.keyboards import KB, PlannerKB
+from engine import planner_repo
+from utils.fsm_states import PlannerFsm
+from utils.keyboards import PlannerKB
 
 router = Router()
 
@@ -41,13 +40,13 @@ async def edit_available_dates(callback: types.CallbackQuery, state: FSMContext)
 @router.callback_query(F.data == 'add_available_dates', PlannerFsm.edit_available_dates)
 async def add_available_dates(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(type_data='add')
-    await callback.message.edit_text(t.planner_choose_month(), reply_markup=PlannerKB.choose_month())
+    await callback.message.edit_text(await t.planner_choose_month(), reply_markup=PlannerKB.choose_month())
 
 
 @router.callback_query(F.data == 'remove_available_dates', PlannerFsm.edit_available_dates)
 async def remove_available_dates(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(type_data='remove')
-    await callback.message.edit_text(t.planner_choose_month(), reply_markup=PlannerKB.choose_month())
+    await callback.message.edit_text(await t.planner_choose_month(), reply_markup=PlannerKB.choose_month())
 
 
 @router.callback_query(PlannerFsm.edit_available_dates)
