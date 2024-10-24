@@ -10,6 +10,7 @@ class Db:
 class AlchemySqlDb(Db):
     def __init__(self, sql_url, base: type[DeclarativeBase], test: bool = False):
         self.metadata = base.metadata
+        self.sql_url = sql_url
         if test:
             self.engine = create_async_engine(sql_url, poolclass=NullPool, echo=False)
         else:

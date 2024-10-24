@@ -2,7 +2,8 @@ import asyncio
 
 from aiogram import Dispatcher
 
-from engine import telegram_bot, redis_storage, shop_repo
+import config
+from engine import telegram_bot, redis_storage, shop_repo, db
 from handlers import (
     main_handlers,
     payment_handlers,
@@ -12,7 +13,6 @@ from handlers import (
 
 
 async def main():
-    # loop = asyncio.get_running_loop()
     dp = Dispatcher(storage=redis_storage)
     dp.include_routers(
         main_handlers.router,
@@ -20,6 +20,8 @@ async def main():
         planner_handlers.router,
         shop_handlers.router
     )
+    if db.sql_url == config.SQLALCHEMY_DB_URL_TEST:
+        input('Подключена тестовая БД. Нажмите Enter, чтобы продолжить.')
     await shop_repo.db.prepare()
     await dp.start_polling(telegram_bot)
     await telegram_bot.delete_webhook(drop_pending_updates=True)

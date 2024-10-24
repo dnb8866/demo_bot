@@ -1,5 +1,5 @@
 from datetime import datetime, date, time
-from sqlalchemy import ForeignKey, BigInteger, Integer
+from sqlalchemy import ForeignKey, BigInteger, Integer, func
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 
 from utils.models import SlotStatus
@@ -15,10 +15,10 @@ class User(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     firstname: Mapped[str] = mapped_column(nullable=True)
     lastname: Mapped[str] = mapped_column(nullable=True)
-    username: Mapped[str] = mapped_column(nullable=True)
+    username: Mapped[str] = mapped_column()
     ban: Mapped[bool] = mapped_column(default=False)
-    created: Mapped[datetime] = mapped_column()
-    updated: Mapped[datetime] = mapped_column()
+    created: Mapped[datetime] = mapped_column(server_default=func.now())
+    updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         return (f'User({self.id}, {self.firstname}, {self.lastname}, '
@@ -56,8 +56,8 @@ class OrderItem(Base):
     order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), nullable=True)
     order: Mapped['Order'] = relationship(back_populates='order_items')
     quantity: Mapped[int] = mapped_column()
-    created: Mapped[datetime] = mapped_column()
-    updated: Mapped[datetime] = mapped_column()
+    created: Mapped[datetime] = mapped_column(server_default=func.now())
+    updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         return (f'OrderItem({self.id}, {self.user_id}, {self.item_id}, {self.order_id}, '
@@ -71,8 +71,8 @@ class Order(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.id'))
     order_items: Mapped[list['OrderItem']] = relationship(back_populates='order', lazy='joined')
     status: Mapped[str] = mapped_column()
-    created: Mapped[datetime] = mapped_column()
-    updated: Mapped[datetime] = mapped_column()
+    created: Mapped[datetime] = mapped_column(server_default=func.now())
+    updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 class Event(Base):
@@ -108,8 +108,8 @@ class Slot(Base):
     slot_date: Mapped[SlotDate] = relationship(back_populates='slots', lazy='joined')
     start_time: Mapped[time] = mapped_column()
     status: Mapped[SlotStatus] = mapped_column()
-    created: Mapped[datetime] = mapped_column()
-    updated: Mapped[datetime] = mapped_column()
+    created: Mapped[datetime] = mapped_column(server_default=func.now())
+    updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         return (f'Slot(id={self.id}, user_id={self.user_id}, event={self.event}, start_date={self.slot_date}, '
