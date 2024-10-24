@@ -64,9 +64,9 @@ async def user_in_db(session, user):
 
 @pytest.fixture
 def events():
-    event_1 = Event(name='event_1', duration=90)
-    event_2 = Event(name='event_2', duration=120)
-    event_3 = Event(name='event_3', duration=45)
+    event_1 = Event(name='Прием', duration=90)
+    event_2 = Event(name='Консультация', duration=120)
+    event_3 = Event(name='Повторный прием', duration=45)
     return [event_1, event_2, event_3]
 
 
