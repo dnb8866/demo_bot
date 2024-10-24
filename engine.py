@@ -5,7 +5,6 @@ import sys
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.redis import RedisStorage
-from sqlalchemy import select
 
 import config
 from utils.db import AlchemySqlDb
@@ -16,11 +15,11 @@ telegram_bot = Bot(token=config.TELEGRAM_BOT_TOKEN, default=DefaultBotProperties
 redis_storage = RedisStorage.from_url(config.REDIS_URL, state_ttl=config.STATE_TTL, data_ttl=config.DATA_TTL)
 logging.basicConfig(level=config.LOG_LEVEL, stream=sys.stdout)
 
-db = AlchemySqlDb(config.SQLALCHEMY_SHOP_DB_URL, Base)
+sql_db = AlchemySqlDb(config.SQLALCHEMY_DB_URL_TEST, Base, test=True)
 
-user_repo = UserRepository(db)
-shop_repo = ShopRepository(db)
-planner_repo = PlannerRepository(db)
+user_repo = UserRepository(sql_db)
+shop_repo = ShopRepository(sql_db)
+planner_repo = PlannerRepository(sql_db)
 
 
 # async def main():

@@ -15,6 +15,7 @@ class UserRepository:
         async with self.db.SessionLocal() as session:
             session.add(user)
             await session.commit()
+            await session.refresh(user)
             return user
 
     async def get(self, user_id: int) -> User | None:
@@ -23,7 +24,6 @@ class UserRepository:
 
     async def update(self, user: User) -> User:
         async with self.db.SessionLocal() as session:
-            user.updated = datetime.datetime.utcnow()
             await session.execute(
                 update(User)
                 .values(
@@ -31,12 +31,12 @@ class UserRepository:
                     lastname=user.lastname,
                     username=user.username,
                     ban=user.ban,
-                    updated=user.updated,
+                    updated=datetime.datetime.utcnow(),
                 )
                 .where(User.id == user.id)
             )
             await session.commit()
-            return user
+            return (await session.execute(select(User).where(User.id == user.id))).scalar_one_or_none()
 
     async def delete(self, user_id: int) -> None:
         async with self.db.SessionLocal() as session:
