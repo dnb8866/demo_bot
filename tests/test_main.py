@@ -40,6 +40,7 @@ class TestUserRepository:
         assert user_from_session.firstname == user.firstname
         assert user_from_session.lastname == user.lastname
         assert user_from_session.username == user.username
+        assert user_from_session.phone_number == user.phone_number
         assert user_from_session.ban == user.ban
 
     async def test_get(self, user_repo, user_in_db, session):

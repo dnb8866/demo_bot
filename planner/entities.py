@@ -1,13 +1,13 @@
-from datetime import time, timedelta, datetime
+from datetime import timedelta, datetime
 
-from utils.constants import PLANNER_DAY_SCHEDULE, PLANNER_WEEK_SCHEDULE
-from utils.models_orm import Slot, Event
+from utils.constants import PLANNER_DAY_SCHEDULE
+from utils.models_orm import Slot
 
 
 class Day:
     def __init__(
             self,
-            slots: list[Slot] = None,
+            slots: list[Slot] | tuple[Slot, ...] = None,
             schedule: dict = PLANNER_DAY_SCHEDULE
     ):
         self.schedule = schedule.copy()

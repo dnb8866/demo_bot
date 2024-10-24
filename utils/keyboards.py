@@ -142,11 +142,25 @@ class PlannerKB(KB):
     b_my_slots = InlineKeyboardButton(text='Мои записи', callback_data='my_slots')
 
     b_back_to_planner = InlineKeyboardButton(text='Назад', callback_data='planner')
+    b_back_to_planner_for_admin = InlineKeyboardButton(text='Назад', callback_data='planner_for_admin')
+    b_back_to_planner_for_client = InlineKeyboardButton(text='Назад', callback_data='planner_for_client')
 
     @classmethod
     def back_to_planner(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         builder.add(cls.b_back_to_planner, cls.b_back_to_main)
+        return builder.adjust(1).as_markup()
+
+    @classmethod
+    def back_to_planner_for_admin(cls) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(cls.b_back_to_planner_for_admin, cls.b_back_to_main)
+        return builder.adjust(1).as_markup()
+
+    @classmethod
+    def back_to_planner_for_client(cls) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(cls.b_back_to_planner_for_client, cls.b_back_to_main)
         return builder.adjust(1).as_markup()
 
     @classmethod
@@ -163,7 +177,6 @@ class PlannerKB(KB):
             cls.b_show_slots,
             cls.b_accept_slots,
             cls.b_reject_slots,
-            cls.b_back_to_planner,
             cls.b_back_to_main
         )
         return builder.adjust(1).as_markup()
@@ -175,28 +188,37 @@ class PlannerKB(KB):
             cls.b_add_slot,
             cls.b_cancel_slot,
             cls.b_my_slots,
-            cls.b_back_to_planner,
             cls.b_back_to_main
         )
         return builder.adjust(1).as_markup()
 
     @classmethod
-    def edit_available_dates(cls) -> InlineKeyboardMarkup:
+    def edit_available_dates_for_admin(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         builder.add(
             cls.b_add_available_dates,
             cls.b_remove_available_dates,
-            cls.b_back_to_planner,
+            cls.b_back_to_planner_for_admin,
             cls.b_back_to_main
         )
         return builder.adjust(1).as_markup()
 
     @classmethod
-    def choose_month(cls) -> InlineKeyboardMarkup:
+    def choose_month_for_admin(cls) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         builder.add(
             cls.b_current_month,
             cls.b_next_month,
+            cls.b_back_to_planner_for_admin,
+            cls.b_back_to_main
+        )
+        return builder.adjust(1).as_markup()
+
+    @classmethod
+    def show_slots(cls):
+        builder = InlineKeyboardBuilder()
+        builder.add(
+            cls.b_show_slots,
             cls.b_back_to_planner,
             cls.b_back_to_main
         )

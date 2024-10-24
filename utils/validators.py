@@ -13,4 +13,11 @@ async def validate_dates(input_text, month, year):
     return True
 
 
-
+async def validate_date(input_text):
+    if not input_text or not isinstance(input_text, str):
+        return False
+    try:
+        day, month, year = input_text.split('.')
+        return date(int(year), int(month), int(day))
+    except ValueError:
+        return False

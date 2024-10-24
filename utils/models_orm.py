@@ -16,6 +16,7 @@ class User(Base):
     firstname: Mapped[str] = mapped_column(nullable=True)
     lastname: Mapped[str] = mapped_column(nullable=True)
     username: Mapped[str] = mapped_column()
+    phone_number: Mapped[int] = mapped_column(nullable=True)
     ban: Mapped[bool] = mapped_column(default=False)
     created: Mapped[datetime] = mapped_column(server_default=func.now())
     updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())

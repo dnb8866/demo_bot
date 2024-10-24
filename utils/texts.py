@@ -4,6 +4,7 @@ from decimal import Decimal
 from sqlalchemy.testing.plugin.plugin_base import logging
 
 import utils.assist as assist
+from planner.entities import Day
 from utils.models_orm import OrderItem, SlotDate
 
 MONTH_TEXT = {
@@ -145,3 +146,21 @@ async def invalid_dates(type_operation):
         return ('Введены некорректные значения. Попробуйте заново.'
                 f'{await planner_get_dates(type_operation)}')
     return 'Ошибка. Попробуйте позже.'
+
+
+async def planner_show_date(event_date: str, day: Day):
+    text = [f'<b><u>Расписание на {event_date}\n</u></b>']
+    for time_event, slot in day.schedule.items():
+        if slot is not None:
+            text.append(f'{time_event}, продолжительность {slot.event.duration} минут.\n'
+                        f'{slot.event.name}, {slot.user.firstname} {slot.user.lastname}, {slot.user.phone_number}\n')
+    return '\n'.join(text)
+
+
+async def show_slots():
+    return 'Введите дату в формате ДД.ММ.ГГГ, чтобы посмотреть записи данного дня'
+
+
+async def invalid_date():
+    return ('Введен некорректный формат даты. Попробуйте ввести его заново.\n'
+            f'{await show_slots()}')
